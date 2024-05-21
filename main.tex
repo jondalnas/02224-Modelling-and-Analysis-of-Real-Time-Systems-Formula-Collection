@@ -1,0 +1,276 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{float}
+
+\title{02224 Modelling and Analysis of Real-Time Systems Formula Collection}
+\date{}
+\author{Jonas Birkedal Dudal Jensen (s203849)}
+
+\begin{document}
+	\maketitle
+
+	\tableofcontents
+
+	\newpage
+	
+	\section{Definition of Timed Automata (Lecture 2)}
+		\begin{enumerate}
+			\item Clock Constraint: $x\triangleright n$ or $x-y\triangleright n$, where $x$ and $y$ are clocks, $\triangleright\in\{<,\leq,=,>,\geq\}$, and $n$ is in integer
+			\item $B(C)$ is all clock contraints, from a set of clocks $C$
+			\item $2^C$ is the set of all subsets of clocks in $C$
+			\item $\mathbb{R}^C_{\geq0}$ is the set of all functions going from all clocks in $C$ to a non-negative real number
+			\item $v\in\mathbb{R}^C_{\geq0}$ is a clock evaluation
+			\item $[r\mapsto0]v$ is the clock evaluation obtained from $v$ by mapping all clocks in the set $r$ to $0$
+			\item A timed automita is the tuple $(L, I_0, C, A, E, I)$
+				\begin{itemize}
+					\item $L$ is a finite set of location
+					\item $I_0\in L$ is the initial location
+					\item $C$ is a finite set of clocks
+					\item $A$ is a finite set of actions
+					\item $E\subseteq L\times A\times B(C)\times 2^C\times L$ is a set of edges
+					\item $I:L\rightarrow B(C)$ assigns inveriants to locations
+				\end{itemize}
+			\item An edge is the tuple $(l, a, g, r, l')$
+				\begin{itemize}
+					\item $l$ and $l'$ are locations
+					\item $a$ is an action - Can be input, output or internal
+					\item $g$ is a guard
+					\item $r$ is a set of clocks that are to be reset
+				\end{itemize}
+			\item $(S,s_0,\rightarrow)$ is the labelled transition system
+				\begin{itemize}
+					\item $S=\{(l,v)\in L\times\mathbb{R}^C_{\geq0}|v$ satisfies the invariant $I(l)\}$
+					\item $s_0=(l_0,v_0)$ is the initial state
+					\item $\rightarrow\subseteq S\times(A\cup\mathbb{R}^C_{\geq0})\times S$ is the transition relations, such that
+						\begin{itemize}
+							\item $(l,v)\xrightarrow{d}(l,v+d)$ for $d>0$
+							\item $(l,v)\rightarrow{a}(l',v')$ if there exists an edge $(l, a, g, r, l')\in E$ such that
+								\begin{itemize}
+									\item $v$ satesfies $g$
+									\item $v'=[r\mapsto0]v$
+									\item $v'$ satesfies the inveriant $I(l')$
+								\end{itemize}
+						\end{itemize}
+				\end{itemize}
+		\end{enumerate}
+
+		\subsection{Other Definitions}
+			\begin{itemize}
+				\item Time Divergent: A path is time divergent if time grows towards infinity, otherwise it is time convergent
+				\item Zeno: A path is Zeno, if it is time convergent and performes an infinit amount of descrete actions
+				\item Deadlock: A state is in a deadlock, if there are no outgoing edges from it, or its delayed successors
+				\item Timelock: A state is in a timelock, if there are no time-divergent paths from it
+			\end{itemize}
+	
+	\section{Computation Tree Logic and syntaxes (Lecture 3)}
+		\subsection{Syntaxes of CTL (p. 16 slides)}
+			In the syntax of a CTL, we have the two propositions $\phi$ and $\psi$ defined as
+			\begin{itemize}
+				\item $a$: An atomic proposition
+				\item $\neg \phi$: Negation
+				\item $\phi\wedge\psi$: And
+				\item $\phi\vee\psi$: Or
+				\item $\phi\Rightarrow\psi$: Implication
+				\item EX$\phi$: There exists a state, where in the next state $\phi$ holds
+				\item AX$\phi$: For all states in all paths, the next state from that original state, $\phi$ holds
+				\item EF$\phi$: There exists some state, at some point, where $\phi$ holds
+				\item AF$\phi$: For all paths, there exists a state in the future, where $\phi$ holds
+				\item EG$\phi$: There exists a path where on all states, $\phi$ holds
+				\item AG$\phi$: For all states in all paths, $\phi$ holds
+				\item $\phi$EU$\psi$: There exists a path where when $\phi$ holds until $\psi$ holds
+				\item $\phi$AU$\psi$: For all paths, $\phi$ always holds until $\psi$ holds
+			\end{itemize}
+
+			Model derivatives can be found on page 43 of slides
+
+		\subsection{Kripke structures (p. 23 and 29 slides)}
+			All CTL formulas are interpreted over Kripke structures $K=(V,E,L,I)$
+			\begin{itemize}
+				\item $V$: All states
+				\item $E\subseteq V\times V$: All transitions between states
+				\item $L: V\rightarrow 2^{AP}$: Labels of V, meaning all propositions that hold for a given state
+				\item $I\subseteq V$: Initial states
+				\item $\pi$: A path in $K$, following transitions in $E$
+				\item $s,K\models\phi$, where $s\in V$: $\phi$ holds in all state $s$
+				\item $K\models\phi$: $\phi$ holds for all initial states of $K$
+			\end{itemize}
+			Propositional and modal logic for $K$ can be found in page 34 and 42 respectively in the slides.
+	
+	\section{Specification Language (Lecture 4 p. 7)}
+		\begin{itemize}
+			\item Reachability: At some point, something might happen (positive)
+			\item Safety: Something will never happen (negative)
+			\item Liveness: At some point, something will enevitably happen (positive)
+		\end{itemize}
+	
+	\section{Scheduling (Leacutre 5 and 6)}
+		\subsection{Definitions}
+			\begin{itemize}
+				\item Schedule: A maping over time, between different tasks and resources
+				\item Scheduling: Process of determening a schedule based on a policy
+				\item Real-time program: A program with real-time requirements (hard, firm, soft)
+				\item Schedulability: If we can create a feasable schedule, where all deadlines are mat
+				\item Scheduling scheme: Has a policy and test, if when improving conditions, the test still holds, it is sustainable
+				\item Optimal schedule policy: A policy which always finds a feasable schedule, if it exists
+				\item Task: A task is some code that is released periodically, with interval $T_i$, and a worst-case execution time $C_i$
+				\item Deadline: A deadline is some time after the task has been released, we expect it to be finnished executing $D_i$ $(C_i\leq D_i\leq T_i)$
+				\item Offset: An offset is some fixed time after the task should execute, we actually execute it ($S_i (S_i\geq0)$)
+				\item Preemption: Preemption is when one task is running, we stop its execution, to switch to another task, and continue with it later
+				\item Task Family: A set of tasks with harmonic periods
+				\item Sporadic Task: A task that is released with some minimal period $T_i$, but width an upper bound (Can be treated as periodic)
+				\item Blocking Time: The time a task may be blocked by a lower priority task, if they are sharing resources
+				\item Critical Region: A region in time where tasks block other tasks
+				\item Priority Inversion: When a high priority task is indirectly blocked by a lower priority task, which is ready
+				\item Priority Inheritance: If a task hits a critical region and cannot continue, then the task holding the region will assume the same priority as the waiting task
+				\item Immediate Priority Ceiling Protocol: If a tasks hits a critical region, then it assumes the priority of the higest priority task that might hit it, plus one
+			\end{itemize}
+
+		\subsection{Policies}
+			\begin{itemize}
+				\item Cyclic Execution: Each task is executed one after another once its period has been reached, uses no threads
+				\item Round Robin: The schedule is divided into time slots, where each ready task will take turn executing
+				\item Fixed Priority: Each task has a fixexd priority, if a task with higher priority is ready, we stop the current execution and switch to the new task (if preemption is used)
+				\item Rate Monotonic Fixed Priority: Same as fixed priority, but tasks with smaller $T_i$ has higher priority (Optimal for simple scheduling)
+				\item Deadline Monotonic Fixed Priority: Same as RMA, but uses $D_i$ instead of $T_i$, a schedule is possible if for all $i$, $R_i\leq D_i$
+				\item Earliest Deadline First Dynamic Priority: Which ever task that is has its deadline next is executed. Feasible iff $\sum U_i\leq 1$ when $D_i=T_i$
+			\end{itemize}
+
+		\subsection{Utilization}
+			\begin{equation}
+				U_i=\frac{C_i}{T_i}
+			\end{equation}
+			Where $U_i$ is the utilization of the $i$'th process, $C_i$ is the computation time, and $T_i$ is the period between task releases.
+
+			For a set of tasks running on a single CPU, the following must hold
+			\begin{equation}
+				\sum^N_{i=1}\frac{C_i}{T_i}\leq1
+			\end{equation}
+			Where $N$ is the total number of tasks.
+
+		\subsection{Liu and Layland}
+			\begin{equation}
+				\sum^N_{i=1}\frac{C_i}{T_i}\leq N\left(2^{\frac{1}{N}}-1\right)
+			\end{equation}
+			Where $C_i$ is the computation time, $T_i$ is the period between task releases, and $N$ is the total number of tasks (Or task families).
+
+		\subsection{Bini et.al.}
+			\begin{equation}
+				\prod^{N}_{i=1}\left(\frac{C_i}{T_i}\right)\leq2
+			\end{equation}
+			Where $C_i$ is the computation time, $T_i$ is the period between task releases, and $N$ is the total number of tasks.
+
+		\subsection{Response Time Analysis}
+			\begin{equation}
+				R_i=C_i+\sum_{j\in hp(i)}\left\lceil{\frac{R_i}{T_j}}\right\rceil C_j
+			\end{equation}
+			Where $R$ is the response time of a task, $C_i$ is the computation time, $T_j$ is the period between a higer priority task releases, and $hp(i)$ is the set of all tasks with higher priority than $i$.
+
+			To calculate this, start by setting $R_i=C_i$ and compute the new $R_i$, then redo until correct solution is found.
+
+			If we introcude resource sharing, then we also need to add that maxmimum blocking time
+			\begin{equation}
+				R_i=C_i+B_i+\sum_{j\in hp(i)}\left\lceil{\frac{R_i}{T_j}}\right\rceil C_j
+			\end{equation}
+
+			Introducing Jitter results in the following equation
+			\begin{equation}
+				R_i=C_i+B_i+\sum_{j\in hp(i)}\left\lceil{\frac{R_i+J_j}{T_j}}\right\rceil C_j
+			\end{equation}
+
+			Introducing context switching results $C_i$ being replaced with $C_i+2C_{CS}$, where $C_{CS}$ is the time it takes to do context switching.
+
+		\subsection{Symetric Multi Processor Schedules}
+		In a SMP, we have $M$ identical processors, with a load $U$, a maximal load of $U_{max}$, and $\beta=\frac{1}{U_{max}}$
+			\begin{itemize}
+				\item Global EDF: Like normal earliest deadline first, but on two processors (feasable if $U\leq M-(M-1)U_{max}$)
+				\item Partitioned FP: FPS but with tasks being assigned to specific processors (feasable if $U\leq M\left(\sqrt{2}-1\right)$)
+				\item Partitioned EDF: EDF but with tasks being assigned to specific processors (feasable if $U\leq\frac{\beta M+1}{\beta+1}$)
+			\end{itemize}
+	
+	\section{Model Checking CTL and TCTL (Lecture 7)}
+		\subsection{Definitions}
+			\begin{itemize}
+				\item Timed CTL: A timed CTL is a CTL where we introduce a clock and remove EX $\phi$ and AX $\phi$
+				\item Clock Region: A clock region is a region of time where a clock is either equal to a certain whole number or in the range of two whole numbers. Used to descritize time
+				\item Region Automita: A region automita is an expansion of a timed automita, where each state is extended to only use clock regions
+			\end{itemize}
+
+	\section{UPPAAL Definitions}
+		\begin{itemize}
+			\item Urgent channel: An urgent channel has no delay over it, and if it can be taken, it must be taken
+			\item Urgent location: An urgent location is a location where no time may be spent
+			\item Commited location: A commited location is a location where no time may be spent and the next edge that is taken, must be from this location
+		\end{itemize}
+	
+	\section{UPPAAL Modality Translation Table (p. 47-59 slides Lecture 3)}
+		\begin{table}[H]
+			\begin{tabular}{c|c|c}
+				CTL&UPPAAL&Meaning\\
+				\hline
+				AG $p$&A[] $p$&For all paths, $p$ holds at all times\\
+				EF $p$&E\textless\textgreater $p$&For some path, $p$ holds at some point\\
+				AF $p$&A\textless\textgreater $p$&For all paths, $p$ holds at some point\\
+				EG $p$&E[] $p$&For some path, $p$ holds at all times\\
+				AG $(p\Rightarrow$ AF$q)$&$p$ -{}-\textgreater$q$&For all paths, if $p$ holds, then at some point $q$ will hold
+			\end{tabular}
+		\end{table}
+		$p$ and $q$ has to be state formulas (formulas that can be cheked without side effects), therefor only a subset of expressions can be used (p. 74)
+		\begin{itemize}
+			\item P$.$l: Process P is in location l
+			\item Clock guards: An inequality of a clock and an integer
+			\item Arythmatic: General arythmetic expressions of constants and variables
+			\item deadlock: The formula deadlock describes if a system is deadlocked or not
+			\item Boolean expressions: General boolean expressions between different state formulas
+		\end{itemize}
+		To verify liveliness, one can use the following expression $x==0$ -{}-\textgreater$x==1$, where $x$ is a clock (p. 80)
+	
+	\section{UPPAAL SMC (Lecture 8)}
+		SMC is a stochastic semantics simulator, it allows for probebalistic choices of edges and uniform/exponential destribution of bound and unbounded delays respectively.
+
+		\subsection{Query language (p. 5-9)}
+			\begin{itemize}
+				\item \texttt{simulate N [ <= bound] \{Eq, \ldots, Ek\}}: Simulate the number system N times, until a maximal time of bound, looking at Ei state expressions
+				\item \texttt{Pr[<= bound] (<>/[] BE)}: Estimate when BE will happen, at a maximal time of bound
+				\item \texttt{Pr[<= bound] (F)$\leq/\geq$ p}: Check if the probability of $F$ is within of p, at a maximal time of bound
+				\item \texttt{Pr[<= bound] (F1)$\geq$ Pr[<= bound] (F2)}: Check if $F1$ happens more often than $F2$, at a maximal time of bound
+				\item \texttt{E[<= bound;N] (min/max:expr)}: Calculates what expr evaluates to most often, therefor expr should be a value or clock
+			\end{itemize}
+
+		\subsection{Form of F (p. 10)}
+			\begin{itemize}
+				\item Boolean expression
+				\item $F_1\wedge F_2$
+				\item $F_1\vee F_2$
+				\item $F_1 U[a,b]F_2$
+				\item $F_1 R[a,b]F_2$
+				\item $<>[a,b]F$
+				\item $[][a,b]F$
+			\end{itemize}
+			Where $a$ and $b$ are natural numbers and $a\leq b$
+	
+	\section{UPPAAL TIGA}
+		\subsection{Definitions}
+			\begin{itemize}
+				\item 2-player game: A controller and an environment, the controller can be controlled, while the environment is random
+				\item Reachability game: \texttt{control: A<> Win}, where \texttt{Win} is the winning state for the controller
+				\item Safety game: \texttt{control : A[] not Lose}, where \texttt{Lose} is the loosing state for the controller
+				\item Memoryless strategy: \texttt{State $\rightarrow$ Action}
+			\end{itemize}
+
+		\subsection{Query language}
+			\begin{itemize}
+				\item Reachability
+					\begin{itemize}
+						\item \texttt{control: A[p U q]}
+						\item \texttt{control: A<> p}
+					\end{itemize}
+
+				\item Safety
+					\begin{itemize}
+						\item \texttt{control: A[p W q]}
+						\item \texttt{control: A[] p}
+					\end{itemize}
+			\end{itemize}
+\end{document}
